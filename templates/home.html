@@ -18,21 +18,35 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-6">
-          <form class="form well">
+        <div class="col-sm-5">
+          <form class="form well" action="/person" method="GET">
             <h3>Search People</h3>
-            <input type="search" name="search"/>
-            <br/>
-            <label>
-              <input type="checkbox" name="Dedupe"/>
-              Dedupe
-            </label>
-            <br/>
-            <button>Search</button>
+            <div class="form-group">
+              <input type="search" name="search" class="input form-control" placeholder="first last ex: Emma Watson"/>
+            </div>
+            <div class="form-group">
+              <label class="form-control">
+                <input type="checkbox" name="Dedupe"/>
+                Dedupe
+              </label>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary">Search</button>
+            </div>
           </form>
         </div>
-        <div class="col-sm-6">
-          <h3>Search Countries</h3>
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-5">
+          <form class="form well" action="/place" method="GET">
+            <h3>Search Locations</h3>
+            <div class="form-group">
+              <input type="search" name="search" class="input form-control" placeholder="location ex: Mongolia"/>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary">Search</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
