@@ -87,7 +87,7 @@ out all of the connections.
 The International Consortium of Investigative Journalists has added several 'SIMILAR_NAME_AND_ADDRESS_AS' relationships between other nodes, so that would be the first step to de-dupe records. This relationship was not added to Emma Watson's records, possibly because one record has her middle names
 and the other does not.
 
-In your future system, you could build a model to assist in this process... there is an especially useful project DeDupe which takes in training data and runs the model to filter your remaining data.
+In your future system, you could build a model to assist in this process... there is an especially useful Python project <a href="https://github.com/datamade/dedupe">DeDupe</a> which takes in training data and runs the model to filter your remaining data.
 
 In this case, I'll focus on the SIMILAR_NAME_AND_ADDRESS_AS relation:
 
@@ -106,8 +106,23 @@ for person in results:
 
 I tried to add ```WHERE mainalt IS null``` but it didn't work well.
 
-Then adding in first/last name check.
+Then adding in first/last name check:
 
+```python
+for person in results:
+    if person[2] is not None:
+        continue
+    multinames = person[0]['name'].lower().split(' ')
+    firstlast = multinames[0] + ' ' + multinames[len(multinames) - 1]
+    if firstlast in names:
+        # add as an alt to the previous record
+        people[names.index(firstlast)][1] = person[0]
+        continue
+    else:
+        names.append(firstlast)
+    # add as an array like this because person is a Record object and cannot be reset later
+    people.append([person[0], person[1], person[2]])
+```
 
 ### Country graph search
 
