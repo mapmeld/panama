@@ -11,6 +11,7 @@ import json
 urls = (
   '/', 'home',
   '/person', 'person',
+  '/place', 'place',
   '/bootstrap.min.css', 'bootstrap'
 )
 
@@ -73,6 +74,18 @@ class person:
                 names.append(first_last_country)
             people.append([person[0], person[1], person[2]])
         return json.dumps(people)
+
+class place:
+    def GET(self):
+        searchQuery = web.input().search.strip()
+        query = """MATCH (n:Officer { countries: {country} })
+          MATCH (n) -[r]-> (e:Entity)
+          RETURN n, r, e"""
+        results = g.run(query, country=searchQuery)
+        people = []
+        for result in results:
+            people.append([result[0], result[1].type(), result[2]])
+        return render.results(people=people)
 
 class bootstrap:
     def GET(self):

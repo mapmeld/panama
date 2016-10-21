@@ -1,0 +1,68 @@
+$def with (people)
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test</title>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="billboard">
+            <h2>
+              Neo4j Search
+              <small>exploring Panama Papers</small>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-5">
+          <form class="form well" action="/person" method="GET">
+            <h3>Search People</h3>
+            <div class="form-group">
+              <input type="search" name="search" class="input form-control" placeholder="ex: Chua Lan"/>
+            </div>
+            <div class="form-group">
+              <label class="form-control">
+                <input type="checkbox" name="Dedupe"/>
+                Dedupe
+              </label>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary">Search</button>
+            </div>
+          </form>
+        </div>
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-5">
+          <form class="form well" action="/place" method="GET">
+            <h3>Search Countries</h3>
+            <div class="form-group">
+              <input type="search" name="search" class="input form-control" placeholder="ex: Mongolia"/>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+          $for person in people:
+            <h3>$person[0]["name"]</h3>
+            $person[1] of $person[2]["name"]
+            <br/>
+            ($person[0]["sourceID"])
+            <hr/>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

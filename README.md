@@ -104,7 +104,7 @@ for person in results:
     people.append(person)
 ```
 
-I tried to add ```WHERE mainalt IS null``` but it didn't work well.
+I tried to add ```WHERE mainalt IS null``` but it didn't work.
 
 Then adding in first/last name check:
 
@@ -126,16 +126,25 @@ for person in results:
 
 ### Country graph search
 
-'Countries' is an array property of the Officer object. We can return people who are from Mongolia and their direct entities like this:
+'Countries' is an array property of the Officer object. We can return people who are based in Mongolia
+like this, skipping a WHERE clause:
 
 ```
-MATCH (n:Officer { countries: 'Mongolia' }) MATCH (n) -[r]- (e:Entity) RETURN n, r, e
+MATCH (n:Officer { countries: 'Mongolia' })
+RETURN n
 ```
 
-This is similar to a single JOIN query and returns some useful data. But how can we keep traversing the
+Now let's receive any Entity that they are connected to.
+The -[r]- query without a directional arrow will follow a Relationship in either direction.
+
+```
+MATCH (n:Officer { countries: 'Mongolia' })
+MATCH (n) -[r]- (e:Entity)
+RETURN n
+```
+
+This is similar to a single JOIN query and returns some useful data. But how can we keep crawling the
 graph and pick up more connections?
-
-Here we use a new relationship to search for relationships in both directions
 
 ```
 MATCH (n:Officer { countries: 'Mongolia' })
@@ -143,13 +152,53 @@ MATCH (n) -[*1..2]- (e)
 RETURN n, e
 ```
 
+Here I am dropping the Entity requirement to include any kind of node on the other end of the relationship.
+
 Unfortunately one of our Mongolia-labeled Officers JOHN F BARGHUSEN, is a shareholder of ACCELONIC LTD. [Blue Earth Refineries Inc. (ex-NATURE EXTRAC LIMITED)]. There are around 1,000 known shareholders in the Panama Papers dataset, so expanding the query out another link would return all of their thousands of relationships, and the query stalls.  But I double checked and John is in Minnesota (abbreviation MN
 was mistaken for Mongolia).  I deleted that record and was able to run the query. But if we try to go deeper on the whole dataset, we will reach more super-nodes.
 
 But even with this number of queries, we can see a handful clusters, and one of them is the biggest.
 CORPORATE MANAGEMENT SERVICES LIMITED has 23 related entities connected to 21 (de-duped) people based in Mongolia.
 
+The query can be smaller if we specify a direction for the query.
+
+```
+MATCH (n:Officer { countries: 'Mongolia' })
+MATCH (n) -[*1..5]-> (e)
+RETURN n, e
+```
+
 #### Visualizing country search results
+
+I decided to use a search for just Officers and Entities, and print a list using
+web.py templating.
+
+```python
+query = """MATCH (n:Officer { countries: {country} })
+  MATCH (n) -[r]-> (e:Entity)
+  RETURN n, r, e"""
+results = g.run(query, country=searchQuery)
+people = []
+for result in results:
+    people.append([result[0], result[1].type(), result[2]])
+return render.results(people=people)
+```
+
+Each row in the people display is going to have info about the person, entity, and
+relationship (defined by using the Relationship.type() function).
+
+Here's how it looks in the template:
+
+```html
+$for person in people:
+  <h3>$person[0]["name"]</h3>
+  $person[1] of $person[2]["name"]
+  <br/>
+  ($person[0]["sourceID"])
+  <hr/>
+```
+
+You could do a lot fancier templates in web.py, but this is what I have at the moment.
 
 ## License
 
